@@ -9,16 +9,18 @@ const supabase = createClient(
 const verificarAuth = async (req, res, next) => {
 
     try {
-        const authHeader = req.headers.authorization;
+        /* const authHeader = req.session.authorization;
 
         if (!authHeader) {
             return res.status(401).json({
                 success: false,
                 message: "Token requerido"
             });
-        }
+        } */
 
-        const token = authHeader.replace("Bearer ", "");
+        const token = req.session.access_token;
+
+        console.log('token')
 
         const { data, error } = await supabase.auth.getUser(token);
 

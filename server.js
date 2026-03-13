@@ -13,6 +13,17 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // 24 horas
+        secure: false,
+        httpOnly: true
+    }
+}));
+
 // middlewares
 app.use(cors());
 app.use(express.json());
