@@ -4,7 +4,7 @@ const multer = require("multer");
 
 const upload = multer({ dest: "uploads/" });
 
-const verificarAuth = require("../middlewares/auth_middleware");
+const verificarAuth = require("../middlewares/auth_middleware.js");
 
 const {
     getProductos,

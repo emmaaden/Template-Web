@@ -6,7 +6,7 @@ $(document).ready(function () {
     }
 
     console.log(token)
-    cargarProductos()
+    cargarDatos()
 
     $("#formProducto").submit(function (e) {
 
@@ -18,21 +18,41 @@ $(document).ready(function () {
 
 })
 
-async function cargarProductos() {
+async function cargarDatos() {
 
     const res = await fetch("/api/productos")
     const data = await res.json()
     const tabla = $("#tablaProductos")
+    let activo = 'No';
+    let totalProductos = 0;
+    let totalCategorias = 0;
+    let productosActivos = 0;
+    let categoriaAnterior = '';
+
     tabla.html("")
     data.forEach(p => {
+        if (p.ACTIVO == true) {
+            activo = 'Si';
+            productosActivos += 1;
+        } else {
+            activo = 'No';
+        };
+
+        if (p.CATEGORIA != categoriaAnterior) {
+            totalCategorias += 1;
+        };
+
+        totalProductos += 1;
+
         tabla.append(`
             <tr>
 
                 <td>${p.ID}</td>
+                <td><img src="${p.imagen}" style="width: 100px;"></td>
                 <td>${p.NOMBRE}</td>
                 <td>${p.PRECIO}</td>
                 <td>${p.CATEGORIA}</td>
-
+                <td>${activo}</td>
                 <td>
 
                     <button onclick="eliminar(${p.ID})" class="btn btn-danger btn-sm">
@@ -44,7 +64,11 @@ async function cargarProductos() {
             </tr>
             `)
     })
+    
 
+    $('#totalProductos').text(totalProductos);
+    $('#totalCategorias').text(totalCategorias);
+    $('#productosActivos').text(productosActivos);
 }
 
 async function guardarProducto() {
@@ -66,12 +90,12 @@ async function guardarProducto() {
     const data = await response.json();
     console.log(data);
 
-    cargarProductos();
+    cargarDatos();
 }
 
 async function eliminar(id) {
     try {
-        const response = await fetch(`api/productos/${id}`, {
+        const response = await fetch(`/api/productos/${id}`, {
             method: "DELETE"
         });
 
@@ -82,7 +106,7 @@ async function eliminar(id) {
         } else {
             console.error("Error:", data);
         }
-        cargarProductos()
+        cargarDatos()
 
     } catch (error) {
         console.error("Error en la petición:", error);

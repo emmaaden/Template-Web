@@ -31,10 +31,20 @@ const login = async (req, res) => {
             });
         }
 
-        res.json({
-            success: true,
-            token: data.session.access_token,
-            user: data.user
+        req.session.isAuthenticated = true;
+
+        req.session.user = {
+            id: data.user.id,
+            email: data.user.email
+        };
+
+        req.session.access_token = data.session.access_token;
+
+        req.session.save(() => {
+            res.json({
+                success: true,
+                user: req.session.user
+            });
         });
 
     } catch (error) {

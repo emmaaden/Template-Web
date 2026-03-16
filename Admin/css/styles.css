@@ -1,40 +1,116 @@
-body {
-    background: #0f172a;
-    color: white;
-    font-family: Arial;
-}
+  body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial;
+  }
 
-.hero {
-    height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: url('../img/placeholder.jpg') center/cover;
-}
+  /* sidebar */
 
-.hero h1 {
-    font-size: 3rem;
-    font-weight: bold;
-}
+  .sidebar {
+      height: 100vh;
+      width: 220px;
+      position: fixed;
+      background: #020617;
+      padding-top: 20px;
+  }
 
-.icon {
-    color: #f59e0b;
-    margin-bottom: 15px;
-}
+  .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      color: #cbd5f5;
+      text-decoration: none;
+  }
 
-.card {
-    background: #1e293b;
-    border: none;
-    color: white;
-}
+  .sidebar a:hover {
+      background: #1e293b;
+      color: white;
+  }
 
-.menu-card img {
-    height: 200px;
-    object-fit: cover;
-}
+  /* main */
 
-.price {
-    font-size: 20px;
-    font-weight: bold;
-    color: #f59e0b;
-}
+  .main {
+      margin-left: 220px;
+      padding: 30px;
+  }
+
+  /* cards */
+
+  .dashboard-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .dashboard-card i {
+      font-size: 28px;
+      color: #f59e0b;
+      margin-bottom: 10px;
+  }
+
+  .table {
+      --bs-table-bg: #1e293b;
+      --bs-table-striped-bg: #243047;
+      --bs-table-hover-bg: #334155;
+      --bs-table-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+  }
+
+  .table td,
+  .table th {
+      vertical-align: middle;
+      border-color: #334155;
+  }
+
+  .table thead {
+    --bs-table-bg: #020617;
+  }
+
+  .table tbody tr:hover {
+    --bs-table-bg: #334155;
+  }
+
+  /* botones */
+
+  .btn-warning {
+      background: #f59e0b;
+      border: none;
+  }
+
+  .btn-warning:hover {
+      background: #d97706;
+  }
+
+  /* modal */
+
+  .modal-content {
+      background: #1e293b;
+      color: white;
+      border: none;
+  }
+
+  .form-control {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+  }
+
+  .form-control:focus {
+      background: #0f172a;
+      color: white;
+      border-color: #f59e0b;
+      box-shadow: none;
+  }
+
+  /* preview imagen */
+
+  .preview-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #020617;
+  }

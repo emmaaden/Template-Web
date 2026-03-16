@@ -3,9 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 
+const session = require('express-session');
+
 const productosRoutes = require("./routes/productos_routes.js");
 const authRoutes = require("./routes/auth_routes.js");
-
 const verificarAuth = require("./middlewares/auth_middleware.js");
 
 dotenv.config();
@@ -32,9 +33,8 @@ app.use(express.urlencoded({ extended: true }));
 // archivos estáticos
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/admin", verificarAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, "admin"))
-})
+// archivos protegidos
+app.use("/admin", verificarAuth, express.static(path.join(__dirname, "admin")));
 
 // API
 app.use("/api/productos", productosRoutes);

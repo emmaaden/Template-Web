@@ -78,7 +78,7 @@ const getProductoById = async (req, res) => {
 // Crear producto
 const crearProducto = async (req, res) => {
     try {
-        const { nombre, precio, descripcion, categoria } = req.body;
+        const { nombre, precio, descripcion, categoria, activo } = req.body;
         const imagen = req.file;
 
         if (!imagen) {
@@ -94,7 +94,8 @@ const crearProducto = async (req, res) => {
                 NOMBRE: nombre,
                 PRECIO: precio,
                 DESCRIPCION: descripcion,
-                CATEGORIA: categoria
+                CATEGORIA: categoria,
+                ACTIVO: activo
             }])
             .select();
 
