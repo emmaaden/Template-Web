@@ -26,6 +26,11 @@
       color: white;
   }
 
+  .activo {
+      background: #1e293b;
+      color: white;
+  }
+
   /* main */
 
   .main {
@@ -65,11 +70,11 @@
   }
 
   .table thead {
-    --bs-table-bg: #020617;
+      --bs-table-bg: #020617;
   }
 
   .table tbody tr:hover {
-    --bs-table-bg: #334155;
+      --bs-table-bg: #334155;
   }
 
   /* botones */

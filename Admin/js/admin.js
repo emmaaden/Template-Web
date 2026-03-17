@@ -27,7 +27,7 @@ async function cargarDatos() {
     let totalProductos = 0;
     let totalCategorias = 0;
     let productosActivos = 0;
-    let categoriaAnterior = '';
+    let categorias = [];
 
     tabla.html("")
     data.forEach(p => {
@@ -38,7 +38,11 @@ async function cargarDatos() {
             activo = 'No';
         };
 
-        if (p.CATEGORIA != categoriaAnterior) {
+
+
+        if (!categorias.includes(p.CATEGORIA)) {
+            categorias.push(p.CATEGORIA);
+            console.log(categorias, p.CATEGORIA);
             totalCategorias += 1;
         };
 
@@ -50,11 +54,14 @@ async function cargarDatos() {
                 <td>${p.ID}</td>
                 <td><img src="${p.imagen}" style="width: 100px;"></td>
                 <td>${p.NOMBRE}</td>
-                <td>${p.PRECIO}</td>
+                <td>$${p.PRECIO}</td>
                 <td>${p.CATEGORIA}</td>
                 <td>${activo}</td>
-                <td>
+                <td class="text-center">
 
+                    <button onclick="datosModalEditar(${p.ID});" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
+                        Editar
+                    </button>
                     <button onclick="eliminar(${p.ID})" class="btn btn-danger btn-sm">
                         Eliminar
                     </button>
@@ -64,7 +71,7 @@ async function cargarDatos() {
             </tr>
             `)
     })
-    
+
 
     $('#totalProductos').text(totalProductos);
     $('#totalCategorias').text(totalCategorias);
@@ -78,6 +85,7 @@ async function guardarProducto() {
     formData.append("descripcion", $("#descripcion").val());
     formData.append("precio", $("#precio").val());
     formData.append("categoria", $("#categoria").val());
+    formData.append("activo", $("#activo").val());
 
     const archivo = $("#imagen")[0].files[0];
     formData.append("imagen", archivo);
@@ -108,6 +116,63 @@ async function eliminar(id) {
         }
         cargarDatos()
 
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
+}
+
+async function datosModalEditar(id) {
+    try {
+        const response = await fetch(`/api/productos/${id}`)
+
+        if (response.ok) {
+
+            const data = await response.json();
+            console.log(data.imagen)
+            $('#previewImagenEditar').attr('src', data.imagen);
+            $('#nombreEditar').val(data.NOMBRE);
+            $('#descripcionEditar').val(data.DESCRIPCION);
+            $('#precioEditar').val(data.PRECIO);
+            $('#categoriaEditar').val(data.CATEGORIA);
+            $('#activoEditar').prop("checked", data.ACTIVO);
+            $('#btnGuardarEditar')
+                .off('click')
+                .on('click', function () {
+                    editar(id);
+                });
+        } else {
+            console.error("Error:", data);
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
+}
+
+async function editar(id) {
+    try {
+        const formData = new FormData();
+        formData.append("nombre", $("#nombreEditar").val());
+        formData.append("descripcion", $("#descripcionEditar").val());
+        formData.append("precio", $("#precioEditar").val());
+        formData.append("categoria", $("#categoriaEditar").val());
+        formData.append("activo", $("#activoEditar").prop("checked"));
+
+        const archivo = $("#imagenEditar")[0].files[0];
+
+        if (archivo) {
+            formData.append("imagen", archivo);
+        }
+
+        const response = await fetch(`/api/productos/update/${id}`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+            cargarDatos();
+        }
     } catch (error) {
         console.error("Error en la petición:", error);
     }

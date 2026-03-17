@@ -17,8 +17,8 @@ async function cargarMenu() {
         const container = $("#menuContainer")
         container.html("")
         data.forEach(item => {
-
-            const card = `
+            if (item.ACTIVO == true) {
+                const card = `
                 <div class="col-md-4 mb-4">
                     <div class="card menu-card">
                         <img src="${item.imagen}" class="card-img-top">
@@ -30,7 +30,9 @@ async function cargarMenu() {
                     </div>
                 </div>
                 `
-            container.append(card)
+                container.append(card)
+            }
+
         })
     } catch (error) {
         console.error(error);

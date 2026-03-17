@@ -10,12 +10,15 @@ const {
     getProductos,
     getProductoById,
     crearProducto,
-    eliminarProducto
+    eliminarProducto,
+    updateProducto
 } = require("../controllers/productos_controller");
 
 router.get("/", getProductos);
 
 router.get("/:id", getProductoById);
+
+router.post("/update/:id", verificarAuth, upload.single("imagen"), updateProducto);
 
 router.post("/", verificarAuth, upload.single("imagen"), crearProducto);
 

@@ -65,7 +65,22 @@ const getProductoById = async (req, res) => {
 
         if (error) throw error;
 
-        res.json(data);
+        let imagen = null;
+
+        if (data.IMAGEN_URL) {
+
+            const { data: img } = supabase
+                .storage
+                .from("productos")
+                .getPublicUrl(data.IMAGEN_URL);
+
+            imagen = img.publicUrl;
+
+        }
+
+        const producto = {...data, imagen}
+
+        res.json(producto);
 
     } catch (error) {
 
@@ -73,6 +88,64 @@ const getProductoById = async (req, res) => {
 
     }
 
+};
+
+// Actualizar producto
+const updateProducto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, precio, descripcion, categoria, activo } = req.body;
+        const imagen = req.file;
+
+        let nombreImagen = null;
+
+        // si viene imagen, la subimos
+        if (imagen) {
+            const file = imagen.buffer;
+            nombreImagen = `producto_${id}.png`;
+
+            const { error: error_img } = await supabase.storage
+                .from("productos")
+                .upload(nombreImagen, file, {
+                    contentType: imagen.mimetype,
+                    upsert: true
+                });
+
+            if (error_img) throw error_img;
+        }
+
+        // armamos update dinámico
+        const updateData = {
+            NOMBRE: nombre,
+            PRECIO: precio,
+            DESCRIPCION: descripcion,
+            CATEGORIA: categoria,
+            ACTIVO: activo
+        };
+
+        if (nombreImagen) {
+            updateData.IMAGEN_URL = nombreImagen;
+        }
+
+        const { data, error } = await supabase
+            .from("PRODUCTOS")
+            .update(updateData)
+            .eq("ID", id)
+            .select();
+
+        if (error) throw error;
+
+        res.json({
+            message: "Producto actualizado correctamente",
+            producto: data[0]
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: error.message
+        });
+    }
 };
 
 // Crear producto
@@ -87,7 +160,7 @@ const crearProducto = async (req, res) => {
             });
         }
 
-        // 1️⃣ crear producto
+        // crear producto
         const { data, error } = await supabase
             .from("PRODUCTOS")
             .insert([{
@@ -103,10 +176,10 @@ const crearProducto = async (req, res) => {
 
         const producto = data[0];
 
-        // 2️⃣ subir imagen
+        // subir imagen
         const file = fs.readFileSync(imagen.path);
         const nombreImagen = `producto_${producto.ID}.png`;
-        
+
         const { error: error_img } = await supabase.storage
             .from("productos")
             .upload(nombreImagen, file, {
@@ -115,7 +188,7 @@ const crearProducto = async (req, res) => {
 
         if (error_img) throw error_img;
 
-        // 3️⃣ guardar referencia
+        // guardar referencia
         const { error: error_update } = await supabase
             .from("PRODUCTOS")
             .update({ IMAGEN_URL: nombreImagen })
@@ -162,6 +235,7 @@ const eliminarProducto = async (req, res) => {
 module.exports = {
     getProductos,
     getProductoById,
+    updateProducto,
     crearProducto,
     eliminarProducto
 };
