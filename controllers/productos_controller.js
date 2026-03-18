@@ -12,11 +12,12 @@ const supabase = createClient(
 const getProductos = async (req, res) => {
 
     try {
+        const { filtro, ascdesc } = req.query;
 
         const { data, error } = await supabase
             .from("PRODUCTOS")
-            .select("*");
-
+            .select("*")
+            .order(filtro, { ascending: ascdesc });
         const productos = data.map(p => {
 
             let imagen = null;
@@ -78,7 +79,7 @@ const getProductoById = async (req, res) => {
 
         }
 
-        const producto = {...data, imagen}
+        const producto = { ...data, imagen }
 
         res.json(producto);
 

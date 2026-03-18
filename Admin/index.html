@@ -20,11 +20,14 @@
     <div class="sidebar">
 
         <h5 class="text-center mb-4">🍔 Admin</h5>
+        <hr>
+        <span class="m-2">Filtros:</h5>
+        <hr>
 
-        <a href="#" class="activo"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-        <a href="#"><i class="fa-solid fa-burger"></i> Productos</a>
-        <a href="#"><i class="fa-solid fa-tags"></i> Categorías</a>
-        <a href="#"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <a href="#" onclick="cargarDatos('ID', true)" class="activo"><i class="fa-solid fa-chart-line"></i> ID</a>
+        <a href="#" onclick="cargarDatos('NOMBRE', true)"><i class="fa-solid fa-burger"></i> Nombre</a>
+        <a href="#" onclick="cargarDatos('CATEGORIA', true)"><i class="fa-solid fa-tags"></i> Categorías</a>
+        <a href="#" onclick="cargarDatos('ACTIVO', true)"><i class="fa-solid fa-right-from-bracket"></i> Activo</a>
 
     </div>
 

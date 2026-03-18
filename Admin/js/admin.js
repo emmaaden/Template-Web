@@ -6,7 +6,7 @@ $(document).ready(function () {
     }
 
     console.log(token)
-    cargarDatos()
+    cargarDatos('ID', true);
 
     $("#formProducto").submit(function (e) {
 
@@ -18,9 +18,8 @@ $(document).ready(function () {
 
 })
 
-async function cargarDatos() {
-
-    const res = await fetch("/api/productos")
+async function cargarDatos(filtro, ascdesc) {
+    const res = await fetch(`/api/productos?filtro=${filtro}&ascdesc=${ascdesc}`);
     const data = await res.json()
     const tabla = $("#tablaProductos")
     let activo = 'No';
@@ -95,10 +94,10 @@ async function guardarProducto() {
         body: formData
     });
 
-    const data = await response.json();
-    console.log(data);
-
-    cargarDatos();
+    if (response.ok) {
+        modal("hide");
+        cargarDatos('ID', true);
+    }
 }
 
 async function eliminar(id) {
@@ -114,7 +113,7 @@ async function eliminar(id) {
         } else {
             console.error("Error:", data);
         }
-        cargarDatos()
+        cargarDatos('ID', true);
 
     } catch (error) {
         console.error("Error en la petición:", error);
@@ -171,7 +170,8 @@ async function editar(id) {
         if (response.ok) {
             const data = await response.json();
             console.log(data);
-            cargarDatos();
+            $('#modalEditarProducto').modal("hide");
+            cargarDatos('ID', true);
         }
     } catch (error) {
         console.error("Error en la petición:", error);

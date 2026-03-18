@@ -12,7 +12,7 @@ async function cargarMenu() {
         }
     });
     try {
-        const res = await fetch("/api/productos")
+        const res = await fetch("/api/productos?filtro=CATEGORIA&ascdesc=ture")
         const data = await res.json()
         const container = $("#menuContainer")
         container.html("")
