@@ -19,62 +19,100 @@ $(document).ready(function () {
 })
 
 async function cargarDatos(filtro, ascdesc) {
-    const res = await fetch(`/api/productos?filtro=${filtro}&ascdesc=${ascdesc}`);
-    const data = await res.json()
-    const tabla = $("#tablaProductos")
-    let activo = 'No';
-    let totalProductos = 0;
-    let totalCategorias = 0;
-    let productosActivos = 0;
-    let categorias = [];
+    try {
+        const res = await fetch(`/api/productos?filtro=${filtro}&ascdesc=${ascdesc}`);
+        const data = await res.json()
+        const tabla = $("#tablaProductos")
+        let activo = 'No';
+        let totalProductos = 0;
+        let totalCategorias = 0;
+        let productosActivos = 0;
+        let categorias = [];
 
-    tabla.html("")
-    data.forEach(p => {
-        if (p.ACTIVO == true) {
-            activo = 'Si';
-            productosActivos += 1;
-        } else {
-            activo = 'No';
-        };
+        if (res.ok) {
+            tabla.html("")
+            data.forEach(p => {
+                if (p.ACTIVO == true) {
+                    activo = 'Si';
+                    productosActivos += 1;
+                } else {
+                    activo = 'No';
+                };
 
+                if (!categorias.includes(p.CATEGORIA)) {
+                    categorias.push(p.CATEGORIA);
+                    console.log(categorias, p.CATEGORIA);
+                    totalCategorias += 1;
+                };
 
+                totalProductos += 1;
+                tabla.append(`
+                <tr>
+                    <td>${p.ID}</td>
+                    <td><img src="${p.imagen}" style="width: 100px;"></td>
+                    <td>${p.NOMBRE}</td>
+                    <td>$${p.PRECIO}</td>
+                    <td>${p.CATEGORIA}</td>
+                    <td>${activo}</td>
+                    <td class="text-center">
 
-        if (!categorias.includes(p.CATEGORIA)) {
-            categorias.push(p.CATEGORIA);
-            console.log(categorias, p.CATEGORIA);
-            totalCategorias += 1;
-        };
+                        <button onclick="datosModalEditar(${p.ID});" class="m-2 btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
+                            Editar
+                        </button>
+                        <button onclick="eliminar(${p.ID})" class="m-2 btn btn-danger btn-sm">
+                            Eliminar
+                        </button>
 
-        totalProductos += 1;
-
-        tabla.append(`
-            <tr>
-
-                <td>${p.ID}</td>
-                <td><img src="${p.imagen}" style="width: 100px;"></td>
-                <td>${p.NOMBRE}</td>
-                <td>$${p.PRECIO}</td>
-                <td>${p.CATEGORIA}</td>
-                <td>${activo}</td>
-                <td class="text-center">
-
-                    <button onclick="datosModalEditar(${p.ID});" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarProducto">
-                        Editar
-                    </button>
-                    <button onclick="eliminar(${p.ID})" class="btn btn-danger btn-sm">
-                        Eliminar
-                    </button>
-
-                </td>
-
+                    </td>
             </tr>
             `)
-    })
+            })
 
+            $('#totalProductos').text(totalProductos);
+            $('#totalCategorias').text(totalCategorias);
+            $('#productosActivos').text(productosActivos);
 
-    $('#totalProductos').text(totalProductos);
-    $('#totalCategorias').text(totalCategorias);
-    $('#productosActivos').text(productosActivos);
+            switch (filtro) {
+                case 'ID':
+                    $('#filtroId').addClass('activo');
+                    $('#filtroNombre').removeClass('activo');
+                    $('#filtroCategoria').removeClass('activo');
+                    $('#filtroActivo').removeClass('activo');
+                    break;
+                case 'NOMBRE':
+                    $('#filtroId').removeClass('activo');
+                    $('#filtroNombre').addClass('activo');
+                    $('#filtroCategoria').removeClass('activo');
+                    $('#filtroActivo').removeClass('activo');
+                    break;
+                case 'CATEGORIA':
+                    $('#filtroId').removeClass('activo');
+                    $('#filtroNombre').removeClass('activo');
+                    $('#filtroCategoria').addClass('activo');
+                    $('#filtroActivo').removeClass('activo');
+                    break;
+                case 'ACTIVO':
+                    $('#filtroId').removeClass('activo');
+                    $('#filtroNombre').removeClass('activo');
+                    $('#filtroCategoria').removeClass('activo');
+                    $('#filtroActivo').addClass('activo');
+                    break;
+                default:
+                    $('#filtroId').removeClass('activo');
+                    $('#filtroNombre').removeClass('activo');
+                    $('#filtroCategoria').removeClass('activo');
+                    $('#filtroActivo').removeClass('activo');
+                    break;
+            }
+        }
+
+    } catch (error) {
+        swal.fire({
+            icon: 'error',
+            title: 'Usuario inexistente',
+            text: error
+        });
+    }
 }
 
 async function guardarProducto() {
