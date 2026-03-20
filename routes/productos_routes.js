@@ -11,7 +11,8 @@ const {
     getProductoById,
     crearProducto,
     eliminarProducto,
-    updateProducto
+    updateProducto,
+    aumentoProducto
 } = require("../controllers/productos_controller");
 
 router.get("/", getProductos);
@@ -19,6 +20,8 @@ router.get("/", getProductos);
 router.get("/:id", getProductoById);
 
 router.post("/update/:id", verificarAuth, upload.single("imagen"), updateProducto);
+
+router.post("/aumento/:id", verificarAuth, aumentoProducto);
 
 router.post("/", verificarAuth, upload.single("imagen"), crearProducto);
 

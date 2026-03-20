@@ -4,9 +4,13 @@
       font-family: Arial;
   }
 
-hr {
-    color: #cbd5f5;
-}
+  hr {
+      color: #cbd5f5;
+  }
+
+  input::placeholder {
+      color: #cbd5f5 !important;
+  }
 
   /* sidebar */
 
@@ -109,6 +113,19 @@ hr {
   .form-control:focus {
       background: #0f172a;
       color: white;
+      border-color: #f59e0b;
+      box-shadow: none;
+  }
+
+  .form-select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5f5;
+  }
+
+  .form-select:focus {
+      background: #0f172a;
+      color: #cbd5f5;
       border-color: #f59e0b;
       box-shadow: none;
   }
