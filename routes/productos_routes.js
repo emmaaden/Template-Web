@@ -14,6 +14,9 @@ const {
     aumentoProducto,
     aumentoCategoria,
     aumentoMassivo,
+    descuentoMassivo,
+    descuentoCategoria,
+    descuentoProducto,
     crearProducto,
     eliminarProducto,
 } = require("../controllers/productos_controller");
@@ -34,6 +37,12 @@ router.post("/aumento", verificarAuth, aumentoMassivo);
 router.post("/aumento/categoria", verificarAuth, aumentoCategoria);
 
 router.post("/aumento/id", verificarAuth, aumentoProducto);
+
+router.post("/descuento", verificarAuth, descuentoMassivo);
+
+router.post("/descuento/categoria", verificarAuth, descuentoCategoria);
+
+router.post("/descuento/id", verificarAuth, descuentoProducto);
 
 router.post("/", verificarAuth, upload.single("imagen"), crearProducto);
 

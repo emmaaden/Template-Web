@@ -290,6 +290,123 @@ const aumentoMassivo = async (req, res) => {
     }
 };
 
+// Descuento ID
+const descuentoProducto = async (req, res) => {
+    try {
+        const { id, porcentaje } = req.body;
+
+        if (!id && !porcentaje) {
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        // 1. Traer precio actual
+        const { data: producto, error: errorGet } = await supabase
+            .from("PRODUCTOS")
+            .select("PRECIO")
+            .eq("ID", id)
+            .single();
+
+        if (errorGet) {
+            return res.status(400).json({ error: errorGet.message });
+        }
+
+        const precioActual = parseFloat(producto.PRECIO);
+        const porc = parseFloat(porcentaje);
+
+        // 2. Calcular nuevo precio
+        const nuevoPrecio = precioActual - (precioActual * porc / 100);
+
+        // 3. Actualizar
+        const { data, error } = await supabase
+            .from("PRODUCTOS")
+            .update({ PRECIO: nuevoPrecio })
+            .eq("ID", id)
+            .select();
+
+        if (error) {
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        return res.json({
+            message: "Descuento exitoso",
+            producto: data[0]
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+// Descuento Categoria
+const descuentoCategoria = async (req, res) => {
+    try {
+        const { categoria, porcentaje } = req.body;
+
+        if (!categoria || !porcentaje) {
+            return res.error(400).json({ error: error.message });
+        }
+
+        const { error } = await supabase.rpc("descuento_categoria", {
+            porcentaje_input: porcentaje,
+            categoria_input: categoria
+        });
+
+        if (error) {
+            console.log("❌ error supabase:", error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.json({
+            message: "Descuento exitoso"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+// Descuento Massivo
+const descuentoMassivo = async (req, res) => {
+    try {
+        const { porcentaje } = req.body;
+
+        if (!porcentaje) {
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        if (porcentaje === undefined) {
+            console.log("❌ porcentaje undefined");
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        const { error } = await supabase.rpc("descuento_todos", {
+            porcentaje_input: porcentaje
+        });
+
+
+        if (error) {
+            console.log("❌ error supabase:", error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.json({
+            message: "Descuento exitoso"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
 // Crear producto
 const crearProducto = async (req, res) => {
     try {
@@ -414,6 +531,9 @@ module.exports = {
     aumentoProducto,
     aumentoCategoria,
     aumentoMassivo,
+    descuentoMassivo,
+    descuentoCategoria,
+    descuentoProducto,
     crearProducto,
     eliminarProducto
 };

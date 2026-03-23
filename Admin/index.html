@@ -96,14 +96,14 @@
                 </select>
             </div>
 
-            <div class="col-md-3 mb-3 d-none" id="div_idProducto">
-                <label class="form-label" for="idProducto">Id Producto</label>
-                <input class="form-control text-white" id="idProducto" placeholder="Escriba el id del producto">
+            <div class="col-md-3 mb-3 d-none" id="div_idProductoAumento">
+                <label class="form-label" for="idProductoAumento">Id Producto</label>
+                <input class="form-control text-white" id="idProductoAumento" placeholder="Escriba el id del producto">
             </div>
 
-            <div class="col-md-3 mb-3 d-none" id="div_categoriaProducto">
-                <label class="form-label" for="categoriaProducto">Id Producto</label>
-                <select class="form-select" name="categoriaProducto" id="categoriaProducto">
+            <div class="col-md-3 mb-3 d-none" id="div_categoriaProductoAumento">
+                <label class="form-label" for="categoriaProductoAumento">Id Producto</label>
+                <select class="form-select" name="categoriaProductoAumento" id="categoriaProductoAumento">
                     <option value="0" selected>Elija una opción</option>
                 </select>
             </div>
@@ -115,6 +115,44 @@
             <div class="col-md-3 mb-3 d-flex align-items-end">
                 <button class="btn btn-warning" onclick="confirmarAumento()">
                     <i class="fa-solid fa-plus"></i> Aumentar
+                </button>
+            </div>
+        </div>
+
+        <div class="row d-none my-4" id="div_descuento">
+            <h4 class="my-4">Descuento</h4>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="tipoDescuento">Elija una tipo de Descuento</label>
+                <select class="form-select" name="tipoDescuento" id="tipoDescuento">
+                    <option value="0" selected>Elija una opción</option>
+                    <option value="1">Por ID</option>
+                    <option value="2">Por Categoría</option>
+                    <option value="3">Todos los productos</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_idProductoDescuento">
+                <label class="form-label" for="idProductoDescuento">Id Producto</label>
+                <input class="form-control text-white" id="idProductoDescuento"
+                    placeholder="Escriba el id del producto">
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_categoriaProductoDescuento">
+                <label class="form-label" for="categoriaProductoDescuento">Id Producto</label>
+                <select class="form-select" name="categoriaProductoDescuento" id="categoriaProductoDescuento">
+                    <option value="0" selected>Elija una opción</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="descuentoProducto">Descuento</label>
+                <input class="form-control text-white" id="descuentoProducto"
+                    placeholder="Porcentaje Descuento producto">
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button class="btn btn-warning" onclick="confirmarDescuento()">
+                    <i class="fa-solid fa-plus"></i> Hacer Descuento
                 </button>
             </div>
         </div>
@@ -176,7 +214,7 @@
 
                         <label>Categoría</label>
                         <select class="form-select mb-3" id="categoria">
-                            
+
                         </select>
 
                         <label id="labelCategoriaNew" class="d-none">Categoría nueva</label>
@@ -268,6 +306,7 @@
     <script>
         $(document).ready(function () {
             $('#tipoAumento').val('0');
+            $('#tipoDescuento').val('0');
 
             const token = localStorage.getItem("token")
 
@@ -305,17 +344,36 @@
             const tipoAumento = $('#tipoAumento').val();
             switch (tipoAumento) {
                 case '1':
-                    $('#div_idProducto').removeClass('d-none');
-                    $('#div_categoriaProducto').addClass('d-none');
+                    $('#div_idProductoAumento').removeClass('d-none');
+                    $('#div_categoriaProductoAumento').addClass('d-none');
                     break;
                 case '2':
-                    $('#div_idProducto').addClass('d-none');
-                    $('#div_categoriaProducto').removeClass('d-none');
-                    cargarCategorias('categoriaProducto');
+                    $('#div_idProductoAumento').addClass('d-none');
+                    $('#div_categoriaProductoAumento').removeClass('d-none');
+                    cargarCategorias('categoriaProductoAumento');
                     break;
                 default:
-                    $('#div_idProducto').addClass('d-none');
-                    $('#div_categoriaProducto').addClass('d-none');
+                    $('#div_idProductoAumento').addClass('d-none');
+                    $('#div_categoriaProductoAumento').addClass('d-none');
+                    break;
+            }
+        });
+
+        $('#tipoDescuento').on('change', function () {
+            const tipoDescuento = $('#tipoDescuento').val();
+            switch (tipoDescuento) {
+                case '1':
+                    $('#div_idProductoDescuento').removeClass('d-none');
+                    $('#div_categoriaProductoDescuento').addClass('d-none');
+                    break;
+                case '2':
+                    $('#div_idProductoDescuento').addClass('d-none');
+                    $('#div_categoriaProductoDescuento').removeClass('d-none');
+                    cargarCategorias('categoriaProductoDescuento');
+                    break;
+                default:
+                    $('#div_idProductoDescuento').addClass('d-none');
+                    $('#div_categoriaProductoDescuento').addClass('d-none');
                     break;
             }
         });
@@ -328,6 +386,7 @@
             $('#div_estadistica').removeClass('d-none');
             $('#div_producto').removeClass('d-none');
             $('#div_aumento').addClass('d-none');
+            $('#div_descuento').addClass('d-none');
 
         });
 
@@ -339,6 +398,7 @@
             $('#div_estadistica').addClass('d-none');
             $('#div_producto').addClass('d-none');
             $('#div_aumento').addClass('d-none');
+            $('#div_descuento').removeClass('d-none');
         });
 
         $('#sectionAumentos').on('click', function () {
@@ -349,7 +409,7 @@
             $('#div_estadistica').addClass('d-none');
             $('#div_producto').addClass('d-none');
             $('#div_aumento').removeClass('d-none');
-
+            $('#div_descuento').addClass('d-none');
         });
 
         $('#categoria').on('change', function () {

@@ -236,8 +236,8 @@ async function editar(id) {
 function confirmarAumento() {
     try {
         const tipoAumento = $('#tipoAumento');
-        const id = $('#idProducto');
-        const categoria = $('#categoriaProducto');
+        const id = $('#idProductoAumento');
+        const categoria = $('#categoriaProductoAumento');
         const porcentaje = $('#aumentoProducto');
 
         if (tipoAumento.val() == '0') {
@@ -263,7 +263,7 @@ function confirmarAumento() {
                         Es por aumentar el producto ${id.val()}
                         Si esta seguro haga click en continuar.
 
-                        <button class="btn btn-warning w-100" onclick="aumentarId('${id.val()}', '${porcentaje.val()}')">
+                        <button class="btn btn-warning w-100" onclick="aumentarId('${id.val()}', '${porcentaje.val()}', 'aumento')">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Continuar
                         </button>
@@ -296,7 +296,7 @@ function confirmarAumento() {
                         Esta por aumentar todos los productos de la categoria ${categoria.val()} un ${porcentaje.val()}%
                         Si esta seguro haga click en continuar.
                         <hr class="m-2">
-                        <button class="btn btn-warning w-100" onclick="aumentoCategoria('${categoria.val()}' ,'${porcentaje.val()}')">
+                        <button class="btn btn-warning w-100" onclick="aumentoCategoria('${categoria.val()}' ,'${porcentaje.val()}', 'aumento')">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Continuar
                         </button>
@@ -325,7 +325,7 @@ function confirmarAumento() {
                         Esta por aumentar todos los productos un ${porcentaje.val()}%
                         Si esta seguro haga click en continuar.
                         <hr class="m-2">
-                        <button class="btn btn-warning w-100" onclick="aumentoMassivo('${porcentaje.val()}')">
+                        <button class="btn btn-warning w-100" onclick="aumentoMassivo('${porcentaje.val()}', 'aumento')">
                             <i class="fa-solid fa-floppy-disk"></i>
                             Continuar
                         </button>
@@ -353,10 +353,128 @@ function confirmarAumento() {
     }
 }
 
-async function aumentarId(id, porcentaje) {
+function confirmarDescuento() {
+    try {
+        const tipoDescuento = $('#tipoDescuento');
+        const id = $('#idProductoDescuento');
+        const categoria = $('#categoriaProductoDescuento');
+        const porcentaje = $('#descuentoProducto');
+
+        if (tipoDescuento.val() == '0') {
+            tipoDescuento.addClass('is-invalid').removeClass('is-valid')
+            return
+        }
+
+        switch (tipoDescuento.val()) {
+            case '1':
+                id.addClass('is-valid').removeClass('is-invalid')
+                porcentaje.addClass('is-valid').removeClass('is-invalid')
+
+                if (
+                    (id.val().trim() != '' && !isNaN(id.val().trim()))
+                    &&
+                    (porcentaje.val().trim() != '' && !isNaN(porcentaje.val().trim()))
+                ) {
+
+                    $('#modalAumentarProducto').modal("show");
+                    $('#modalAumentarProductoBody').empty();
+                    $('#modalAumentarProductoBody').append(`
+                        Esta por hacer un descuento en el producto ${id.val()}
+                        Si esta seguro haga click en continuar.
+
+                        <button class="btn btn-warning w-100" onclick="aumentarId('${id.val()}', '${porcentaje.val()}', 'descuento')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Continuar
+                        </button>
+                        `)
+
+                    console.log('todo ok')
+                } else {
+                    if (id.val().trim() == '' || isNaN(id.val().trim())) {
+                        id.addClass('is-invalid')
+                    }
+
+                    if (porcentaje.val().trim() == '' || isNaN(porcentaje.val().trim())) {
+                        porcentaje.addClass('is-invalid')
+                    }
+                }
+                break;
+
+            case '2':
+                categoria.addClass('is-valid').removeClass('is-invalid')
+                porcentaje.addClass('is-valid').removeClass('is-invalid')
+
+                if (
+                    (categoria.val().trim() != '')
+                    ||
+                    (porcentaje.val().trim() != '' && !isNaN(porcentaje.val().trim()))) {
+
+                    $('#modalAumentarProducto').modal("show");
+                    $('#modalAumentarProductoBody').empty();
+                    $('#modalAumentarProductoBody').append(`
+                        Esta por hacer un descuento a todos los productos de la categoria ${categoria.val()} un ${porcentaje.val()}%
+                        Si esta seguro haga click en continuar.
+                        <hr class="m-2">
+                        <button class="btn btn-warning w-100" onclick="aumentoCategoria('${categoria.val()}' ,'${porcentaje.val()}', 'descuento')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Continuar
+                        </button>
+                        `)
+
+                    console.log('todo ok')
+                } else {
+                    if (categoria.val().trim() == '') {
+                        categoria.addClass('is-invalid')
+                    }
+
+                    if (porcentaje.val().trim() == '' || isNaN(porcentaje.val().trim())) {
+                        porcentaje.addClass('is-invalid')
+                    }
+                }
+                break;
+
+            case '3':
+                porcentaje.addClass('is-valid').removeClass('is-invalid')
+
+                if (porcentaje.val().trim() != '' && !isNaN(porcentaje.val().trim())) {
+
+                    $('#modalAumentarProducto').modal("show");
+                    $('#modalAumentarProductoBody').empty();
+                    $('#modalAumentarProductoBody').append(`
+                        Esta por hacer un descuento a todos los productos un ${porcentaje.val()}%
+                        Si esta seguro haga click en continuar.
+                        <hr class="m-2">
+                        <button class="btn btn-warning w-100" onclick="aumentoMassivo('${porcentaje.val()}', 'descuento')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Continuar
+                        </button>
+                        `)
+
+                    console.log('todo ok')
+                } else {
+                    if (porcentaje.val().trim() == '' || isNaN(porcentaje.val().trim())) {
+                        porcentaje.addClass('is-invalid')
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+
+    } catch (error) {
+        swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error
+        });
+    }
+}
+
+async function aumentarId(id, porcentaje, accion) {
     try {
         if (id != '' && !isNaN(id) && porcentaje != '' && !isNaN(porcentaje)) {
-            const response = await fetch(`/api/productos/aumento/id`, {
+            const response = await fetch(`/api/productos/${accion}/id`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -390,10 +508,10 @@ async function aumentarId(id, porcentaje) {
 
 }
 
-async function aumentoCategoria(categoria, porcentaje) {
+async function aumentoCategoria(categoria, porcentaje, accion) {
     try {
         if (porcentaje != '' && !isNaN(porcentaje)) {
-            const response = await fetch(`/api/productos/aumento/categoria`, {
+            const response = await fetch(`/api/productos/${accion}/categoria`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -428,10 +546,10 @@ async function aumentoCategoria(categoria, porcentaje) {
 
 }
 
-async function aumentoMassivo(porcentaje) {
+async function aumentoMassivo(porcentaje, accion) {
     try {
         if (porcentaje != '' && !isNaN(porcentaje)) {
-            const response = await fetch(`/api/productos/aumento/`, {
+            const response = await fetch(`/api/productos/${accion}/`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
