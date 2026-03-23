@@ -1,0 +1,150 @@
+  body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial;
+  }
+
+  hr {
+      color: #cbd5f5;
+  }
+
+  input::placeholder {
+      color: #cbd5f5 !important;
+  }
+
+  /* sidebar */
+
+  .sidebar {
+      height: 100vh;
+      width: 220px;
+      position: fixed;
+      background: #020617 !important;
+      padding-top: 20px;
+  }
+
+  .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      color: #cbd5f5 !important;
+      text-decoration: none;
+  }
+
+  .sidebar a:hover {
+      background: #1e293b !important;
+      color: white !important;
+  }
+
+  .activo {
+      background: #1e293b !important;
+      color: white !important;
+  }
+
+  /* main */
+
+  .main {
+      margin-left: 220px;
+      padding: 30px;
+  }
+
+  /* cards */
+
+  .dashboard-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .dashboard-card i {
+      font-size: 28px;
+      color: #f59e0b;
+      margin-bottom: 10px;
+  }
+
+  .table {
+      --bs-table-bg: #1e293b;
+      --bs-table-striped-bg: #243047;
+      --bs-table-hover-bg: #334155;
+      --bs-table-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+  }
+
+  .table td,
+  .table th {
+      vertical-align: middle;
+      border-color: #334155;
+  }
+
+  .table thead {
+      --bs-table-bg: #020617;
+  }
+
+  .table tbody tr:hover {
+      --bs-table-bg: #334155;
+  }
+
+  /* botones */
+
+  .btn-warning {
+      background: #f59e0b;
+      border: none;
+  }
+
+  .btn-warning:hover {
+      background: #d97706;
+  }
+
+  /* modal */
+
+  .modal-content {
+      background: #1e293b;
+      color: white;
+      border: none;
+  }
+
+  .form-control {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+  }
+
+  .form-control:focus {
+      background: #0f172a;
+      color: white;
+      border-color: #f59e0b;
+      box-shadow: none;
+  }
+
+  .form-select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5f5;
+  }
+
+  .form-select:focus {
+      background: #0f172a;
+      color: #cbd5f5;
+      border-color: #f59e0b;
+      box-shadow: none;
+  }
+
+  /* preview imagen */
+
+  .preview-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #020617;
+  }
+
+  /* media query */
+  @media (max-width: 991px) {
+      .main {
+          margin: 0;
+          padding: 1rem;
+      }
+  }

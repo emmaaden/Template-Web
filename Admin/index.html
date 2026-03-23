@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+
+<body>
+
+    <header class="navbar sticky-top flex-md-nowrap p-2 shadow d-lg-none">
+        <button class="nav-link px-3 text-white d-lg-none" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars fa-xl"></i>
+        </button>
+    </header>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar offcanvas-lg offcanvas-end" tabindex="-1" aria-labelledby="sidebarMenuLabel" id="sidebarMenu">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="text-white">🍔 Admin</h5>
+
+            <button type="button" class="text-white btn d-lg-none" data-bs-dismiss="offcanvas"
+                data-bs-target="#sidebarMenu" aria-label="Close"><i class="fa-solid fa-xmark fa-xl"></i></button>
+        </div>
+        <hr>
+        <a class="m-2 text-white text-start btn btn-dark" data-bs-toggle="collapse" href="#collapseFiltro" role="button"
+            aria-expanded="false" aria-controls="collapseFiltro"><i class="fa-solid fa-filter"></i> Filtros</a>
+
+        <div class="collapse show" id="collapseFiltro">
+            <a href="#" onclick="cargarDatos('ID', true)" class="activo" id="filtroId"><i
+                    class="fa-solid fa-chart-line"></i> ID</a>
+            <a href="#" onclick="cargarDatos('NOMBRE', true)" id="filtroNombre"><i class="fa-solid fa-burger"></i>
+                Nombre</a>
+            <a href="#" onclick="cargarDatos('CATEGORIA', true)" id="filtroCategoria"><i class="fa-solid fa-tags"></i>
+                Categorías</a>
+            <a href="#" onclick="cargarDatos('ACTIVO', true)" id="filtroActivo"><i
+                    class="fa-solid fa-right-from-bracket"></i> Activo</a>
+        </div>
+        <hr>
+        <a href="#" class="activo" id="sectionProductos"><i class="fa-solid fa-clipboard-list"></i> Productos</a>
+        <a href="#" id="sectionDescuentos"><i class="fa-solid fa-percent"></i> Descuentos</a>
+        <a href="#" id="sectionAumentos"><i class="fa-solid fa-chart-line"></i> Aumentos</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- <h2 class="mb-4">Productos</h2> -->
+
+        <!-- Estadísticas -->
+        <div class="row mb-4" id="div_estadistica">
+            <div class="col-md-4 mb-3">
+                <div class="dashboard-card">
+                    <i class="fa-solid fa-utensils"></i>
+                    <h4 id="totalProductos">0</h4>
+                    <p>Productos</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="dashboard-card">
+                    <i class="fa-solid fa-tags"></i>
+                    <h4 id="totalCategorias">0</h4>
+                    <p>Categorías</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="dashboard-card">
+                    <i class="fa-solid fa-check"></i>
+                    <h4 id="productosActivos">0</h4>
+                    <p>Activos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aumento -->
+        <div class="row d-none my-4" id="div_aumento">
+            <h4 class="my-4">Aumento</h4>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="tipoAumento">Elija una tipo de Aumento</label>
+                <select class="form-select" name="tipoAumento" id="tipoAumento">
+                    <option value="0" selected>Elija una opción</option>
+                    <option value="1">Por ID</option>
+                    <option value="2">Por Categoría</option>
+                    <option value="3">Todos los productos</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_idProductoAumento">
+                <label class="form-label" for="idProductoAumento">Id Producto</label>
+                <input class="form-control text-white" id="idProductoAumento" placeholder="Escriba el id del producto">
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_categoriaProductoAumento">
+                <label class="form-label" for="categoriaProductoAumento">Id Producto</label>
+                <select class="form-select" name="categoriaProductoAumento" id="categoriaProductoAumento">
+                    <option value="0" selected>Elija una opción</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="aumentoProducto">Aumento</label>
+                <input class="form-control text-white" id="aumentoProducto" placeholder="Porcentaje Aumento producto">
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button class="btn btn-warning" onclick="confirmarAumento()">
+                    <i class="fa-solid fa-plus"></i> Aumentar
+                </button>
+            </div>
+        </div>
+
+        <div class="row d-none my-4" id="div_descuento">
+            <h4 class="my-4">Descuento</h4>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="tipoDescuento">Elija una tipo de Descuento</label>
+                <select class="form-select" name="tipoDescuento" id="tipoDescuento">
+                    <option value="0" selected>Elija una opción</option>
+                    <option value="1">Por ID</option>
+                    <option value="2">Por Categoría</option>
+                    <option value="3">Todos los productos</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_idProductoDescuento">
+                <label class="form-label" for="idProductoDescuento">Id Producto</label>
+                <input class="form-control text-white" id="idProductoDescuento"
+                    placeholder="Escriba el id del producto">
+            </div>
+
+            <div class="col-md-3 mb-3 d-none" id="div_categoriaProductoDescuento">
+                <label class="form-label" for="categoriaProductoDescuento">Id Producto</label>
+                <select class="form-select" name="categoriaProductoDescuento" id="categoriaProductoDescuento">
+                    <option value="0" selected>Elija una opción</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="descuentoProducto">Descuento</label>
+                <input class="form-control text-white" id="descuentoProducto"
+                    placeholder="Porcentaje Descuento producto">
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button class="btn btn-warning" onclick="confirmarDescuento()">
+                    <i class="fa-solid fa-plus"></i> Hacer Descuento
+                </button>
+            </div>
+        </div>
+
+        <!-- Producto -->
+        <div class="d-flex justify-content-between align-items-center mb-3" id="div_producto">
+            <h4>Productos</h4>
+
+            <div class="d-flex gap-2">
+                <input class="form-control text-white" id="buscarProducto" placeholder="Buscar producto">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalProducto">
+                    <i class="fa-solid fa-plus"></i> Nuevo
+                </button>
+            </div>
+        </div>
+
+        <!-- tabla -->
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Activo</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductos">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL Nuevo Producto -->
+    <div class="modal fade" id="modalProducto">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5><i class="fa-solid fa-burger"></i> Producto</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formProducto">
+                        <img id="previewImagen" class="preview-img">
+                        <input type="file" id="imagen" class="form-control mb-3">
+
+                        <label>Nombre</label>
+                        <input class="form-control mb-3" id="nombre">
+
+                        <label>Descripción</label>
+                        <textarea class="form-control mb-3" id="descripcion"></textarea>
+
+                        <label>Precio</label>
+                        <input class="form-control mb-3" type="number" id="precio">
+
+                        <label>Categoría</label>
+                        <select class="form-select mb-3" id="categoria">
+
+                        </select>
+
+                        <label id="labelCategoriaNew" class="d-none">Categoría nueva</label>
+                        <input class="form-control mb-3 d-none" id="categoriaNew">
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="activo" checked>
+                            <label class="form-check-label">Producto disponible</label>
+                        </div>
+
+                        <button class="btn btn-warning w-100">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Guardar producto
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL Editar Producto -->
+    <div class="modal fade" id="modalEditarProducto">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5><i class="fa-solid fa-burger"></i> Editar Producto</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <img id="previewImagenEditar" class="preview-img">
+
+                    <input type="file" id="imagenEditar" class="form-control mb-3">
+
+                    <label>Nombre</label>
+                    <input class="form-control mb-3" id="nombreEditar">
+
+                    <label>Descripción</label>
+                    <textarea class="form-control mb-3" id="descripcionEditar"></textarea>
+
+                    <label>Precio</label>
+                    <input class="form-control mb-3" type="number" id="precioEditar">
+
+                    <label>Categoría</label>
+                    <select class="form-select mb-3" id="categoriaEditar">
+
+                    </select>
+
+                    <div class="form-check form-switch mb-3">
+
+                        <input class="form-check-input" type="checkbox" id="activoEditar" checked>
+
+                        <label class="form-check-label">Producto disponible</label>
+
+                    </div>
+
+                    <button class="btn btn-warning w-100" id="btnGuardarEditar">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Guardar producto
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAumentarProducto">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5><i class="fa-solid fa-burger"></i> Aumentar Producto</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body" id="modalAumentarProductoBody">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tipoAumento').val('0');
+            $('#tipoDescuento').val('0');
+
+            const token = localStorage.getItem("token")
+
+            if (!token) {
+                window.location = "/login.html"
+            }
+
+            console.log(token)
+            cargarDatos('ID', true);
+
+            $("#formProducto").submit(function (e) {
+
+                e.preventDefault()
+
+                guardarProducto()
+
+            })
+
+            cargarCategorias('categoria', true);
+        })
+
+        $("#imagen").on("change", function (e) {
+
+            const file = e.target.files[0]
+            if (file) {
+                const reader = new FileReader()
+                reader.onload = function (ev) {
+                    $("#previewImagen").attr("src", ev.target.result)
+                }
+                reader.readAsDataURL(file)
+            }
+        })
+
+        $('#tipoAumento').on('change', function () {
+            const tipoAumento = $('#tipoAumento').val();
+            switch (tipoAumento) {
+                case '1':
+                    $('#div_idProductoAumento').removeClass('d-none');
+                    $('#div_categoriaProductoAumento').addClass('d-none');
+                    break;
+                case '2':
+                    $('#div_idProductoAumento').addClass('d-none');
+                    $('#div_categoriaProductoAumento').removeClass('d-none');
+                    cargarCategorias('categoriaProductoAumento');
+                    break;
+                default:
+                    $('#div_idProductoAumento').addClass('d-none');
+                    $('#div_categoriaProductoAumento').addClass('d-none');
+                    break;
+            }
+        });
+
+        $('#tipoDescuento').on('change', function () {
+            const tipoDescuento = $('#tipoDescuento').val();
+            switch (tipoDescuento) {
+                case '1':
+                    $('#div_idProductoDescuento').removeClass('d-none');
+                    $('#div_categoriaProductoDescuento').addClass('d-none');
+                    break;
+                case '2':
+                    $('#div_idProductoDescuento').addClass('d-none');
+                    $('#div_categoriaProductoDescuento').removeClass('d-none');
+                    cargarCategorias('categoriaProductoDescuento');
+                    break;
+                default:
+                    $('#div_idProductoDescuento').addClass('d-none');
+                    $('#div_categoriaProductoDescuento').addClass('d-none');
+                    break;
+            }
+        });
+
+        $('#sectionProductos').on('click', function () {
+            $('#sectionProductos').addClass('activo');
+            $('#sectionDescuentos').removeClass('activo');
+            $('#sectionAumentos').removeClass('activo');
+
+            $('#div_estadistica').removeClass('d-none');
+            $('#div_producto').removeClass('d-none');
+            $('#div_aumento').addClass('d-none');
+            $('#div_descuento').addClass('d-none');
+
+        });
+
+        $('#sectionDescuentos').on('click', function () {
+            $('#sectionProductos').removeClass('activo');
+            $('#sectionDescuentos').addClass('activo');
+            $('#sectionAumentos').removeClass('activo');
+
+            $('#div_estadistica').addClass('d-none');
+            $('#div_producto').addClass('d-none');
+            $('#div_aumento').addClass('d-none');
+            $('#div_descuento').removeClass('d-none');
+        });
+
+        $('#sectionAumentos').on('click', function () {
+            $('#sectionProductos').removeClass('activo');
+            $('#sectionDescuentos').removeClass('activo');
+            $('#sectionAumentos').addClass('activo');
+
+            $('#div_estadistica').addClass('d-none');
+            $('#div_producto').addClass('d-none');
+            $('#div_aumento').removeClass('d-none');
+            $('#div_descuento').addClass('d-none');
+        });
+
+        $('#categoria').on('change', function () {
+            if ($('#categoria').val() == 'otro') {
+                $('#labelCategoriaNew').removeClass('d-none');
+                $('#categoriaNew').removeClass('d-none');
+            } else {
+                $('#labelCategoriaNew').addClass('d-none');
+                $('#categoriaNew').addClass('d-none');
+            }
+        });
+    </script>
+
+    <script src="js/admin.js"></script>
+
+</body>
+
+</html>

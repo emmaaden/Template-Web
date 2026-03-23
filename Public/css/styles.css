@@ -1,0 +1,40 @@
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial;
+}
+
+.hero {
+    height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    background: url('../img/placeholder.jpg') center/cover;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.icon {
+    color: #f59e0b;
+    margin-bottom: 15px;
+}
+
+.card {
+    background: #1e293b;
+    border: none;
+    color: white;
+}
+
+.menu-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f59e0b;
+}
