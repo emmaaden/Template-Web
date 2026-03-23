@@ -6,6 +6,9 @@ async function cargarMenu() {
     Swal.fire({
         title: 'Cargando productos...',
         text: 'Espere un momento',
+        background: '#1e1e2f',
+        color: '#fff',
+        confirmButtonColor: '#4CAF50',
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -19,12 +22,12 @@ async function cargarMenu() {
         let categorias = [];
         data.forEach(item => {
             if (item.ACTIVO == true) {
-                if (!categorias.includes(item.CATEGORIA)) {
-                    categorias.push(item.CATEGORIA);
-                    console.log(categorias, item.CATEGORIA);
+                if (!categorias.includes(item.CATEGORIAS.NOMBRE)) {
+                    categorias.push(item.CATEGORIAS.NOMBRE);
+                    console.log(categorias, item.CATEGORIAS.NOMBRE);
                     container.append(`
                         <div class="col-12 mb-3">
-                            <h3>${item.CATEGORIA}</h3>
+                            <h3>${item.CATEGORIAS.NOMBRE}</h3>
                             <hr>
                         </div>
                         `)

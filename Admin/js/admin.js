@@ -1,4 +1,15 @@
 async function cargarDatos(filtro, ascdesc) {
+    Swal.fire({
+        title: 'Cargando productos...',
+        text: 'Espere un momento',
+        background: '#1e1e2f',
+        color: '#fff',
+        confirmButtonColor: '#4CAF50',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     try {
         const res = await fetch(`/api/productos?filtro=${filtro}&ascdesc=${ascdesc}`);
         const data = await res.json()
@@ -10,6 +21,7 @@ async function cargarDatos(filtro, ascdesc) {
         let categorias = [];
 
         if (res.ok) {
+
             tabla.html("")
             data.forEach(p => {
                 if (p.ACTIVO == true) {
@@ -32,7 +44,7 @@ async function cargarDatos(filtro, ascdesc) {
                     <td><img src="${p.imagen}" style="width: 100px;"></td>
                     <td>${p.NOMBRE}</td>
                     <td>$${p.PRECIO}</td>
-                    <td>${p.CATEGORIA}</td>
+                    <td>${p.CATEGORIAS.NOMBRE}</td>
                     <td>${activo}</td>
                     <td class="text-center">
 
@@ -93,6 +105,28 @@ async function cargarDatos(filtro, ascdesc) {
             text: error
         });
     }
+    Swal.close();
+}
+
+async function cargarCategorias(id, opcion) {
+    try {
+        const response = await fetch(`/api/productos/categorias`);
+        const data = await response.json();
+        $(`#${id}`).empty()
+        data.forEach(element => {
+            $(`#${id}`).append(`
+                <option value="${element.id}">${element.nombre}</option>
+            `);
+        });
+        if (opcion) {
+            $(`#${id}`).append(`
+                <option value="otro">Crear una categoria nueva</option>
+            `);
+        }
+
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
 }
 
 async function guardarProducto() {
@@ -101,6 +135,7 @@ async function guardarProducto() {
     formData.append("nombre", $("#nombre").val());
     formData.append("descripcion", $("#descripcion").val());
     formData.append("precio", $("#precio").val());
+    formData.append("categoriaNew", $("#categoriaNew").val());
     formData.append("categoria", $("#categoria").val());
     formData.append("activo", $("#activo").val());
 
@@ -113,7 +148,7 @@ async function guardarProducto() {
     });
 
     if (response.ok) {
-        modal("hide");
+        $('#modalProducto').modal("hide");
         cargarDatos('ID', true);
     }
 }
@@ -141,6 +176,8 @@ async function eliminar(id) {
 async function datosModalEditar(id) {
     try {
         const response = await fetch(`/api/productos/${id}`)
+
+        await cargarCategorias('categoriaEditar');
 
         if (response.ok) {
 
@@ -213,7 +250,7 @@ function confirmarAumento() {
             case '1':
                 id.addClass('is-valid').removeClass('is-invalid')
                 porcentaje.addClass('is-valid').removeClass('is-invalid')
-                
+
                 if (
                     (id.val().trim() != '' && !isNaN(id.val().trim()))
                     &&
@@ -244,6 +281,64 @@ function confirmarAumento() {
                 }
                 break;
 
+            case '2':
+                categoria.addClass('is-valid').removeClass('is-invalid')
+                porcentaje.addClass('is-valid').removeClass('is-invalid')
+
+                if (
+                    (categoria.val().trim() != '')
+                    ||
+                    (porcentaje.val().trim() != '' && !isNaN(porcentaje.val().trim()))) {
+
+                    $('#modalAumentarProducto').modal("show");
+                    $('#modalAumentarProductoBody').empty();
+                    $('#modalAumentarProductoBody').append(`
+                        Esta por aumentar todos los productos de la categoria ${categoria.val()} un ${porcentaje.val()}%
+                        Si esta seguro haga click en continuar.
+                        <hr class="m-2">
+                        <button class="btn btn-warning w-100" onclick="aumentoCategoria('${categoria.val()}' ,'${porcentaje.val()}')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Continuar
+                        </button>
+                        `)
+
+                    console.log('todo ok')
+                } else {
+                    if (categoria.val().trim() == '') {
+                        categoria.addClass('is-invalid')
+                    }
+
+                    if (porcentaje.val().trim() == '' || isNaN(porcentaje.val().trim())) {
+                        porcentaje.addClass('is-invalid')
+                    }
+                }
+                break;
+
+            case '3':
+                porcentaje.addClass('is-valid').removeClass('is-invalid')
+
+                if (porcentaje.val().trim() != '' && !isNaN(porcentaje.val().trim())) {
+
+                    $('#modalAumentarProducto').modal("show");
+                    $('#modalAumentarProductoBody').empty();
+                    $('#modalAumentarProductoBody').append(`
+                        Esta por aumentar todos los productos un ${porcentaje.val()}%
+                        Si esta seguro haga click en continuar.
+                        <hr class="m-2">
+                        <button class="btn btn-warning w-100" onclick="aumentoMassivo('${porcentaje.val()}')">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Continuar
+                        </button>
+                        `)
+
+                    console.log('todo ok')
+                } else {
+                    if (porcentaje.val().trim() == '' || isNaN(porcentaje.val().trim())) {
+                        porcentaje.addClass('is-invalid')
+                    }
+                }
+                break;
+
             default:
                 console.log('xd')
                 break;
@@ -261,7 +356,7 @@ function confirmarAumento() {
 async function aumentarId(id, porcentaje) {
     try {
         if (id != '' && !isNaN(id) && porcentaje != '' && !isNaN(porcentaje)) {
-            const response = await fetch(`/api/productos/aumento/${id}`, {
+            const response = await fetch(`/api/productos/aumento/id`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
@@ -274,10 +369,88 @@ async function aumentarId(id, porcentaje) {
 
             if (response.ok) {
                 $('#modalAumentarProducto').modal("hide");
-                cargarDatos('ID', true)
+                await cargarDatos('ID', true)
                 swal.fire({
                     icon: 'success',
-                    title: 'Aumento Exitoso'
+                    title: 'Aumento Exitoso',
+                    background: '#1e1e2f',
+                    color: '#fff',
+                    confirmButtonColor: '#4CAF50',
+                    allowOutsideClick: false,
+                });
+            }
+        }
+    } catch (error) {
+        swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error
+        });
+    }
+
+}
+
+async function aumentoCategoria(categoria, porcentaje) {
+    try {
+        if (porcentaje != '' && !isNaN(porcentaje)) {
+            const response = await fetch(`/api/productos/aumento/categoria`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    categoria,
+                    porcentaje
+                })
+            });
+
+            if (response.ok) {
+                $('#modalAumentarProducto').modal("hide");
+                await cargarDatos('ID', true);
+
+                swal.fire({
+                    icon: 'success',
+                    title: 'Aumento Exitoso',
+                    background: '#1e1e2f',
+                    color: '#fff',
+                    confirmButtonColor: '#4CAF50',
+                    allowOutsideClick: false,
+                });
+            }
+        }
+    } catch (error) {
+        swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error
+        });
+    }
+
+}
+
+async function aumentoMassivo(porcentaje) {
+    try {
+        if (porcentaje != '' && !isNaN(porcentaje)) {
+            const response = await fetch(`/api/productos/aumento/`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    porcentaje
+                })
+            });
+
+            if (response.ok) {
+                $('#modalAumentarProducto').modal("hide");
+                await cargarDatos('ID', true)
+                swal.fire({
+                    icon: 'success',
+                    title: 'Aumento Exitoso',
+                    background: '#1e1e2f',
+                    color: '#fff',
+                    confirmButtonColor: '#4CAF50',
+                    allowOutsideClick: false,
                 });
             }
         }

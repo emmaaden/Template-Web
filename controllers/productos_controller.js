@@ -1,4 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
+const { error } = require("console");
 require("dotenv").config();
 
 const fs = require('fs')
@@ -15,8 +16,14 @@ const getProductos = async (req, res) => {
 
         const { data, error } = await supabase
             .from("PRODUCTOS")
-            .select("*")
+            .select(`
+                *,
+                CATEGORIAS (
+                    NOMBRE
+                )
+            `)
             .order(filtro, { ascending: ascdesc });
+
         const productos = data.map(p => {
 
             let imagen = null;
@@ -50,6 +57,24 @@ const getProductos = async (req, res) => {
     }
 
 };
+
+// Obtener Categorias
+const getCategorias = async (req, res) => {
+    try {
+        const { data, error } = await supabase.rpc("traer_categorias")
+
+        if (error) {
+            console.log("❌ error supabase:", error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.json(data);
+
+    } catch (error) {
+        console.log("❌ error:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
 
 // Obtener producto por id
 const getProductoById = async (req, res) => {
@@ -182,17 +207,84 @@ const aumentoProducto = async (req, res) => {
             .select();
 
         if (error) {
-            return res.status(400).json({ error: error.message });
+            return res.status(400).json({ error: 'faltan datos' });
         }
 
-        res.json({
+        return res.json({
             message: "Aumentado exitoso",
             producto: data[0]
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+// Aumento Categoria
+const aumentoCategoria = async (req, res) => {
+    try {
+        const { categoria, porcentaje } = req.body;
+
+        if (!categoria || !porcentaje) {
+            return res.error(400).json({ error: error.message });
+        }
+
+        const { error } = await supabase.rpc("aumentar_categoria", {
+            porcentaje_input: porcentaje,
+            categoria_input: categoria
+        });
+
+        if (error) {
+            console.log("❌ error supabase:", error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.json({
+            message: "Aumento exitoso"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+// Aumento Massivo
+const aumentoMassivo = async (req, res) => {
+    try {
+        const { porcentaje } = req.body;
+
+        if (!porcentaje) {
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        if (porcentaje === undefined) {
+            console.log("❌ porcentaje undefined");
+            return res.status(400).json({ error: 'faltan datos' });
+        }
+
+        const { error } = await supabase.rpc("aumentar_todos", {
+            porcentaje_input: porcentaje
+        });
+
+
+        if (error) {
+            console.log("❌ error supabase:", error);
+            return res.status(400).json({ error: error.message });
+        }
+
+        return res.json({
+            message: "Aumento exitoso"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
             error: error.message
         });
     }
@@ -201,7 +293,7 @@ const aumentoProducto = async (req, res) => {
 // Crear producto
 const crearProducto = async (req, res) => {
     try {
-        const { nombre, precio, descripcion, categoria, activo } = req.body;
+        let { nombre, precio, descripcion, categoria, categoriaNew, activo } = req.body;
         const imagen = req.file;
 
         if (!imagen) {
@@ -210,19 +302,51 @@ const crearProducto = async (req, res) => {
             });
         }
 
+        if (categoria == 'otro') {
+
+            if (categoriaNew != undefined && categoriaNew != '') {
+
+                const { data, error } = await supabase.rpc("crear_categoria", {
+                    categoria_input: categoriaNew
+                });
+
+                if (error) {
+                    return res.status(400).json({
+                        error: "Error al crear la categoria"
+                    });
+                }
+
+                if (!data || data.length === 0) {
+                    return res.status(400).json({
+                        error: "No se pudo crear la categoria"
+                    });
+                }
+
+                categoria = data[0].id;
+            } else {
+
+                return res.status(400).json({
+                    error: "Debe seleccionar una categoria"
+                });
+            }
+        }
+
         // crear producto
-        const { data, error } = await supabase
-            .from("PRODUCTOS")
-            .insert([{
-                NOMBRE: nombre,
-                PRECIO: precio,
-                DESCRIPCION: descripcion,
-                CATEGORIA: categoria,
-                ACTIVO: activo
-            }])
-            .select();
+        const { data, error } = await supabase.rpc("crear_producto", {
+            nombre_input: nombre,
+            descripcion_input: descripcion,
+            precio_input: precio,
+            categoria_input: categoria,
+            activo_input: activo,
+            orden_input: 1,
+            imagen_url_input: ''
+        });
 
         if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error("No se pudo crear el producto");
+        }
 
         const producto = data[0];
 
@@ -285,8 +409,11 @@ const eliminarProducto = async (req, res) => {
 module.exports = {
     getProductos,
     getProductoById,
+    getCategorias,
     updateProducto,
     aumentoProducto,
+    aumentoCategoria,
+    aumentoMassivo,
     crearProducto,
     eliminarProducto
 };

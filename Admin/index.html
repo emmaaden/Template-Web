@@ -175,7 +175,12 @@
                         <input class="form-control mb-3" type="number" id="precio">
 
                         <label>Categoría</label>
-                        <input class="form-control mb-3" id="categoria">
+                        <select class="form-select mb-3" id="categoria">
+                            
+                        </select>
+
+                        <label id="labelCategoriaNew" class="d-none">Categoría nueva</label>
+                        <input class="form-control mb-3 d-none" id="categoriaNew">
 
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" id="activo" checked>
@@ -194,7 +199,6 @@
 
     <!-- MODAL Editar Producto -->
     <div class="modal fade" id="modalEditarProducto">
-
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -218,7 +222,9 @@
                     <input class="form-control mb-3" type="number" id="precioEditar">
 
                     <label>Categoría</label>
-                    <input class="form-control mb-3" id="categoriaEditar">
+                    <select class="form-select mb-3" id="categoriaEditar">
+
+                    </select>
 
                     <div class="form-check form-switch mb-3">
 
@@ -250,7 +256,7 @@
                 <div class="modal-body" id="modalAumentarProductoBody">
 
 
-                </div>                
+                </div>
             </div>
         </div>
     </div>
@@ -280,6 +286,7 @@
 
             })
 
+            cargarCategorias('categoria', true);
         })
 
         $("#imagen").on("change", function (e) {
@@ -304,6 +311,7 @@
                 case '2':
                     $('#div_idProducto').addClass('d-none');
                     $('#div_categoriaProducto').removeClass('d-none');
+                    cargarCategorias('categoriaProducto');
                     break;
                 default:
                     $('#div_idProducto').addClass('d-none');
@@ -342,6 +350,16 @@
             $('#div_producto').addClass('d-none');
             $('#div_aumento').removeClass('d-none');
 
+        });
+
+        $('#categoria').on('change', function () {
+            if ($('#categoria').val() == 'otro') {
+                $('#labelCategoriaNew').removeClass('d-none');
+                $('#categoriaNew').removeClass('d-none');
+            } else {
+                $('#labelCategoriaNew').addClass('d-none');
+                $('#categoriaNew').addClass('d-none');
+            }
         });
     </script>
 
