@@ -31,10 +31,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // archivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "Public")));
 
 // archivos protegidos
-app.use("/admin", verificarAuth, express.static(path.join(__dirname, "admin")));
+app.use("/admin", verificarAuth, express.static(path.join(__dirname, "Admin")));
 
 // API
 app.use("/api/productos", productosRoutes);
