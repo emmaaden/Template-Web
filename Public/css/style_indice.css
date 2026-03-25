@@ -1,0 +1,32 @@
+.categorias-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+
+.categorias-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.categoria-pill {
+    padding: 10px 18px;
+    background: #1e293b;
+    border-radius: 999px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid #334155;
+}
+
+.categoria-pill:hover {
+    background: #334155;
+}
+
+.categoria-activa {
+    background: #f59e0b;
+    color: black;
+    font-weight: bold;
+    border: none;
+}
