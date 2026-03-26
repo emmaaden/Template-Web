@@ -31,14 +31,35 @@ const login = async (req, res) => {
             });
         }
 
+        const idAuth = data.user.id
+
+        console.log(idAuth)
+
+        const { data: dataClient, error: errorClient } = await supabase
+            .from("CLIENTES")
+            .select(`*`)
+            .eq("ID_AUTH", idAuth);
+
+        if (errorClient) {
+            return res.status(401).json({
+                success: false,
+                message: "Cliente no registrado"
+            });
+        }
+
+        console.log(dataClient)
+
         req.session.isAuthenticated = true;
 
         req.session.user = {
             id: data.user.id,
-            email: data.user.email
+            email: data.user.email,
+            data: dataClient
         };
 
         req.session.access_token = data.session.access_token;
+
+        console.log(req.session.user)
 
         req.session.save(() => {
             res.json({
@@ -55,7 +76,6 @@ const login = async (req, res) => {
         });
 
     }
-
 };
 
 module.exports = {

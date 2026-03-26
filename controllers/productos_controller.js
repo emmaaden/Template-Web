@@ -13,7 +13,8 @@ const supabase = createClient(
 const getProductos = async (req, res) => {
     try {
         const { filtro, ascdesc } = req.query;
-
+        const id_cliente = req.session.user.data[0].ID
+        
         const { data, error } = await supabase
             .from("PRODUCTOS")
             .select(`
@@ -22,6 +23,7 @@ const getProductos = async (req, res) => {
                     NOMBRE
                 )
             `)
+            .eq("ID_CLIENTE", id_cliente)
             .order(filtro, { ascending: ascdesc });
 
         const productos = data.map(p => {
