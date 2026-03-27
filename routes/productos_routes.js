@@ -19,9 +19,10 @@ const {
     descuentoProducto,
     crearProducto,
     eliminarProducto,
+    getProductosPublic,
 } = require("../controllers/productos_controller");
 
-router.get("/", getProductos);
+router.get("/publico", getProductosPublic);
 
 router.get("/categorias", getCategorias);
 
@@ -29,6 +30,7 @@ router.get("/:id", getProductoById);
 
 
 // Privadas
+router.get("/", getProductos);
 
 router.post("/update/:id", verificarAuth, upload.single("imagen"), updateProducto);
 

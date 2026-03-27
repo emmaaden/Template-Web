@@ -1,7 +1,6 @@
 let productosGlobal = []
 $(document).ready(function () {
-    cargarMenu()
-
+    cargarMenu();
 })
 
 async function cargarMenu() {
@@ -17,7 +16,8 @@ async function cargarMenu() {
         }
     });
     try {
-        const res = await fetch("/api/productos?filtro=CATEGORIA&ascdesc=ture");
+        const dominio = window.location.hostname;
+        const res = await fetch(`/api/productos/publico?filtro=CATEGORIA&ascdesc=ture&dominio=${dominio}`);
         const data = await res.json();
 
         productosGlobal = data

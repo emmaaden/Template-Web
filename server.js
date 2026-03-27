@@ -7,6 +7,7 @@ const session = require('express-session');
 
 const productosRoutes = require("./routes/productos_routes.js");
 const authRoutes = require("./routes/auth_routes.js");
+const paginaRoutes = require("./routes/pagina_routes.js");
 const verificarAuth = require("./middlewares/auth_middleware.js");
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use("/admin", verificarAuth, express.static(path.join(__dirname, "Admin")));
 // API
 app.use("/api/productos", productosRoutes);
 app.use("/api", authRoutes);
+app.use("/pagina", paginaRoutes);
 
 // ruta principal
 app.get("/", (req, res) => {

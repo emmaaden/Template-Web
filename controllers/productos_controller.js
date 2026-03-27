@@ -1,5 +1,4 @@
 const { createClient } = require("@supabase/supabase-js");
-const { error } = require("console");
 require("dotenv").config();
 
 const fs = require('fs')
@@ -19,11 +18,10 @@ const getProductosPublic = async (req, res) => {
             .from("PRODUCTOS")
             .select(`
                 *,
-                CATEGORIAS (
-                    NOMBRE
-                )
+                CATEGORIAS ( NOMBRE ),
+                CLIENTES!inner ( DOMINIO )
             `)
-            .eq("DOMINIO", dominio)
+            .eq("CLIENTES.DOMINIO", dominio)
             .order(filtro, { ascending: ascdesc });
 
         const productos = data.map(p => {
