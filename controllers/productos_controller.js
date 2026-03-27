@@ -9,12 +9,12 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 );
 
+
 // Obtener productos
-const getProductos = async (req, res) => {
+const getProductosPublic = async (req, res) => {
     try {
-        const { filtro, ascdesc } = req.query;
-        const id_cliente = req.session.user.data[0].ID
-        
+        const { filtro, ascdesc, dominio } = req.query;
+
         const { data, error } = await supabase
             .from("PRODUCTOS")
             .select(`
@@ -23,7 +23,58 @@ const getProductos = async (req, res) => {
                     NOMBRE
                 )
             `)
-            .eq("ID_CLIENTE", id_cliente)
+            .eq("DOMINIO", dominio)
+            .order(filtro, { ascending: ascdesc });
+
+        const productos = data.map(p => {
+
+            let imagen = null;
+
+            if (p.IMAGEN_URL) {
+
+                const { data: img } = supabase
+                    .storage
+                    .from("productos")
+                    .getPublicUrl(p.IMAGEN_URL);
+
+                imagen = img.publicUrl;
+
+            }
+
+            return {
+                ...p,
+                imagen
+            };
+
+        });
+
+        if (error) throw error;
+
+        res.json(productos);
+
+    } catch (error) {
+
+        res.status(500).json({ error: error.message });
+
+    }
+
+};
+
+// Obtener productos
+const getProductos = async (req, res) => {
+    try {
+        const { filtro, ascdesc } = req.query;
+        const cliente_id = req.session.user.data[0].ID
+
+        const { data, error } = await supabase
+            .from("PRODUCTOS")
+            .select(`
+                *,
+                CATEGORIAS (
+                    NOMBRE
+                )
+            `)
+            .eq("ID_CLIENTE", cliente_id)
             .order(filtro, { ascending: ascdesc });
 
         const productos = data.map(p => {
@@ -63,7 +114,11 @@ const getProductos = async (req, res) => {
 // Obtener Categorias
 const getCategorias = async (req, res) => {
     try {
-        const { data, error } = await supabase.rpc("traer_categorias")
+        const cliente_id = req.session.user.data[0].ID
+
+        const { data, error } = await supabase.rpc("traer_categorias", {
+            cliente_id_input: cliente_id
+        });
 
         if (error) {
             console.log("❌ error supabase:", error);
@@ -81,13 +136,14 @@ const getCategorias = async (req, res) => {
 // Obtener producto por id
 const getProductoById = async (req, res) => {
     try {
-
         const { id } = req.params;
+        const cliente_id = req.session.user.data[0].ID
 
         const { data, error } = await supabase
             .from("PRODUCTOS")
             .select("*")
             .eq("ID", id)
+            .eq("ID_CLIENTE", cliente_id)
             .single();
 
         if (error) throw error;
@@ -123,6 +179,7 @@ const updateProducto = async (req, res) => {
         const { id } = req.params;
         const { nombre, precio, descripcion, categoria, activo } = req.body;
         const imagen = req.file;
+        const cliente_id = req.session.user.data[0].ID
 
         let nombreImagen = null;
 
@@ -158,6 +215,7 @@ const updateProducto = async (req, res) => {
             .from("PRODUCTOS")
             .update(updateData)
             .eq("ID", id)
+            .eq("ID_CLIENTE", cliente_id)
             .select();
 
         if (error) throw error;
@@ -179,6 +237,7 @@ const updateProducto = async (req, res) => {
 const aumentoProducto = async (req, res) => {
     try {
         const { id, porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!id && !porcentaje) {
             return res.status(400).json({ error: 'faltan datos' });
@@ -189,6 +248,7 @@ const aumentoProducto = async (req, res) => {
             .from("PRODUCTOS")
             .select("PRECIO")
             .eq("ID", id)
+            .eq("ID_CLIENTE", cliente_id)
             .single();
 
         if (errorGet) {
@@ -229,12 +289,14 @@ const aumentoProducto = async (req, res) => {
 const aumentoCategoria = async (req, res) => {
     try {
         const { categoria, porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!categoria || !porcentaje) {
             return res.error(400).json({ error: error.message });
         }
 
         const { error } = await supabase.rpc("aumentar_categoria", {
+            cliente_id_input: cliente_id,
             porcentaje_input: porcentaje,
             categoria_input: categoria
         });
@@ -260,6 +322,7 @@ const aumentoCategoria = async (req, res) => {
 const aumentoMassivo = async (req, res) => {
     try {
         const { porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!porcentaje) {
             return res.status(400).json({ error: 'faltan datos' });
@@ -271,6 +334,7 @@ const aumentoMassivo = async (req, res) => {
         }
 
         const { error } = await supabase.rpc("aumentar_todos", {
+            cliente_id_input: cliente_id,
             porcentaje_input: porcentaje
         });
 
@@ -296,6 +360,7 @@ const aumentoMassivo = async (req, res) => {
 const descuentoProducto = async (req, res) => {
     try {
         const { id, porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!id && !porcentaje) {
             return res.status(400).json({ error: 'faltan datos' });
@@ -306,6 +371,7 @@ const descuentoProducto = async (req, res) => {
             .from("PRODUCTOS")
             .select("PRECIO")
             .eq("ID", id)
+            .eq("ID_CLIENTE", cliente_id)
             .single();
 
         if (errorGet) {
@@ -346,12 +412,14 @@ const descuentoProducto = async (req, res) => {
 const descuentoCategoria = async (req, res) => {
     try {
         const { categoria, porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!categoria || !porcentaje) {
             return res.error(400).json({ error: error.message });
         }
 
         const { error } = await supabase.rpc("descuento_categoria", {
+            cliente_id_input: cliente_id,
             porcentaje_input: porcentaje,
             categoria_input: categoria
         });
@@ -377,6 +445,7 @@ const descuentoCategoria = async (req, res) => {
 const descuentoMassivo = async (req, res) => {
     try {
         const { porcentaje } = req.body;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!porcentaje) {
             return res.status(400).json({ error: 'faltan datos' });
@@ -388,6 +457,7 @@ const descuentoMassivo = async (req, res) => {
         }
 
         const { error } = await supabase.rpc("descuento_todos", {
+            cliente_id_input: cliente_id,
             porcentaje_input: porcentaje
         });
 
@@ -414,6 +484,7 @@ const crearProducto = async (req, res) => {
     try {
         let { nombre, precio, descripcion, categoria, categoriaNew, activo } = req.body;
         const imagen = req.file;
+        const cliente_id = req.session.user.data[0].ID
 
         if (!imagen) {
             return res.status(400).json({
@@ -452,6 +523,7 @@ const crearProducto = async (req, res) => {
 
         // crear producto
         const { data, error } = await supabase.rpc("crear_producto", {
+            cliente_id_input: cliente_id,
             nombre_input: nombre,
             descripcion_input: descripcion,
             precio_input: precio,
@@ -512,7 +584,8 @@ const eliminarProducto = async (req, res) => {
         const { error } = await supabase
             .from("PRODUCTOS")
             .delete()
-            .eq("ID", id);
+            .eq("ID", id)
+            .eq("ID_CLIENTE", cliente_id);
 
         if (error) throw error;
 
@@ -526,6 +599,7 @@ const eliminarProducto = async (req, res) => {
 
 
 module.exports = {
+    getProductosPublic,
     getProductos,
     getProductoById,
     getCategorias,
